@@ -384,6 +384,7 @@ namespace YouTubeWindows
 
         private void CoreWebView2_PermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
         {
+            e.State = CoreWebView2PermissionState.Allow;
             e.Handled = true;
         }
 
