@@ -19,10 +19,10 @@ namespace YouTubeWindows {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource {
+    public class Resource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace YouTubeWindows {
         ///   返回此类使用的缓存的 ResourceManager 实例。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("YouTubeWindows.Resource", typeof(Resource).Assembly);
@@ -51,7 +51,7 @@ namespace YouTubeWindows {
         ///   使用此强类型资源类的所有资源查找执行重写。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace YouTubeWindows {
         /// <summary>
         ///   查找类似于 (图标) 的 System.Drawing.Icon 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Icon icon {
+        public static System.Drawing.Icon icon {
             get {
                 object obj = ResourceManager.GetObject("icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -71,16 +71,40 @@ namespace YouTubeWindows {
         }
         
         /// <summary>
-        ///   查找类似 YouTube For Windows Client By TGSAN
+        ///   查找类似 /**
+        /// * 创建一个用于拦截并记录日志的 Proxy
+        /// * @param {Object|Function} targetObject 目标对象或函数
+        /// * @param {String} path 当前对象的路径记录（用于日志输出）
+        /// * @returns {Proxy} 返回被代理的对象
+        /// */
+        ///function createBridgeProxy(targetObject, path = &apos;mockObject&apos;) {
         ///
-        ///Base EBWebview2 - Microsoft Edge (Chromium) Runtime
+        ///    // 封装的日志输出函数
+        ///    const log = (message) =&gt; {
+        ///        if (window.StarboardBridge &amp;&amp; typeof window.StarboardBridge.ConsoleWriteLine === &apos;function&apos;) {
+        ///            window.StarboardBridge.ConsoleWriteLine(message);
+        ///        } else {
+        ///            // 如果 StarboardBridge 尚未注入，退回使用 console. [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        public static string InitJs {
+            get {
+                return ResourceManager.GetString("InitJs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 YouTube Leanback for Windows &lt;--%PROGRAM_VERSION%--&gt;
+        ///By TGSAN
         ///
+        ///Windows Cobalt on EBWebView2
+        ///Microsoft Edge (Chromium) Runtime
+        ///Version: &lt;--%WEBVIEW_VERSION%--&gt;
         ///
         ///YouTube
         ///
         ///YouTube 是 Google 的子公司 的本地化字符串。
         /// </summary>
-        internal static string Staff {
+        public static string Staff {
             get {
                 return ResourceManager.GetString("Staff", resourceCulture);
             }
@@ -101,7 +125,7 @@ namespace YouTubeWindows {
         ///  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
         ///  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string youtube_splash_screen {
+        public static string youtube_splash_screen {
             get {
                 return ResourceManager.GetString("youtube_splash_screen", resourceCulture);
             }

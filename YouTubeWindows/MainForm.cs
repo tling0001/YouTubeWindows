@@ -23,6 +23,7 @@ namespace YouTubeWindows
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
+        private string userAgent = string.Empty;
         private string lang = System.Globalization.CultureInfo.InstalledUICulture.Name;
         public bool allowAutoHDR = false;
         public string webview2StartupArgs = "";
@@ -155,11 +156,14 @@ namespace YouTubeWindows
 
         public MainForm(string[] args)
         {
+            string systemWebViewPath = Path.Combine(Environment.SystemDirectory, "Microsoft-Edge-WebView").ToString();
             string[] runtimePaths = {
                 // Fixed Version 固定版本
-                AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "runtime",
+                //AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "runtime",
                 // Evergreen 长青版
-                null
+                null,
+                // System 内置版本
+                systemWebViewPath,
             };
 
             foreach (string runtimePath in runtimePaths)
@@ -175,7 +179,19 @@ namespace YouTubeWindows
             {
 #if DEBUG
                 var availableBrowserVersionString = CoreWebView2Environment.GetAvailableBrowserVersionString();
-                MessageBox.Show("当前 WebView2 Runtime:\n" + (webview2RuntimeInfo.Value.Path == null ? "Evergreen Runtime" : "Fixed Version Runtime: " + webview2RuntimeInfo.Value.Path) + "\nVersion: " + availableBrowserVersionString, "YouTube");
+                var runtimeInfoHeader = "";
+                if (webview2RuntimeInfo.Value.Path == null) {
+                    runtimeInfoHeader = "Evergreen Runtime";
+                }
+                else if (webview2RuntimeInfo.Value.Path == systemWebViewPath)
+                {
+                    runtimeInfoHeader = "System Runtime";
+                }
+                else
+                {
+                    runtimeInfoHeader = "Fixed Version Runtime";
+                }
+                MessageBox.Show("当前 WebView2 Runtime:\n" + runtimeInfoHeader + "\nVersion: " + availableBrowserVersionString, "YouTube");
 #endif
             }
             else
@@ -247,9 +263,9 @@ namespace YouTubeWindows
         private void MainForm_Load(object sender, EventArgs e)
         {
             var userDataDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "User Data";
-            var ua = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2025/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ")";
-            webview2StartupArgs = webview2StartupArgs + "--single-process --allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --user-agent=\"" + ua + "\"";
-
+            userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.02.302";
+            webview2StartupArgs = webview2StartupArgs + "--single-process --allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint";
+            
             if (!allowAutoHDR)
             {
                 webview2StartupArgs += " --disable_vp_auto_hdr";
@@ -321,14 +337,8 @@ namespace YouTubeWindows
         private async Task NativeBridgeRegister(WebView2 webView2)
         {
             webView2.CoreWebView2.AddHostObjectToScript("NativeBridge", new Bridge(this));
-            // 简化 NativeBridge
-            await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.NativeBridge = window?.chrome?.webview?.hostObjects?.NativeBridge;");
-            // 替换 Close
-            await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.close = window?.chrome?.webview?.hostObjects?.NativeBridge?.Close;");
-            // 全屏和重载监听
-            await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.addEventListener('keydown', (event) => { if (event.keyCode === 122) { event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); event.returnValue = false; NativeBridge.ToggleFullscreen(); } if(event.keyCode == 116 || (event.ctrlKey && event.keyCode == 82)) { event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); event.returnValue = false; NativeBridge.ReloadApp(); } }, true);");
-            // Video 标签 Hook
-            await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.HTMLVideoElement.prototype.playOriginal = window.HTMLVideoElement.prototype.play; window.HTMLVideoElement.prototype.play = function (...args) { this.msVideoProcessing = \"msGraphicsDriverEnhancement\"; return this.playOriginal(...args); }");
+            // 初始化 NativeBridge 和 Hook
+            await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Resource.InitJs);
         }
 
         private async void InitializeSplashScreenAsync()
@@ -348,6 +358,7 @@ namespace YouTubeWindows
         private async void InitializeMainAppAsync()
         {
             await screenWebView.EnsureCoreWebView2Async(coreWebView2Environment);
+            screenWebView.CoreWebView2.Settings.UserAgent = userAgent;
             await NativeBridgeRegister(screenWebView);
             _ = screenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setEmitTouchEventsForMouse", "{\"enabled\": true}");
             _ = screenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setDeviceMetricsOverride", "{\"width\": 0, \"height\": 0, \"deviceScaleFactor\": 1, \"scale\": 0.1, \"screenWidth\": 7680,\"screenHeight\": 4320, \"mobile\": false, \"dontSetVisibleSize\": false}");
@@ -413,8 +424,6 @@ namespace YouTubeWindows
         {
             if (screenWebView.Source.ToString().StartsWith("https://www.youtube.com"))
             {
-                // 破解分辨率新版用 DeviceMetricsOverride 替代
-                screenWebView.ExecuteScriptAsync("{ setTimeout(() => { NativeBridge.ActiveScreen(); }, 0); }");
                 // 后台播放
                 screenWebView.ExecuteScriptAsync("for (event_name of ['visibilitychange', 'webkitvisibilitychange', 'blur']) { window.addEventListener(event_name, function(event) { event.stopImmediatePropagation(); }, true); }");
                 // 注入动画
@@ -505,7 +514,12 @@ namespace YouTubeWindows
             ctxMainForm.fullscreen = !ctxMainForm.fullscreen;
         }
 
-        public void ActiveScreen()
+        public void ConsoleWriteLine(string content)
+        {
+            Console.WriteLine(content);
+        }
+
+        public void HideSplashScreen()
         {
             new Thread(() =>
             {
