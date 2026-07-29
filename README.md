@@ -13,7 +13,7 @@
 1. Install WebView2 Runtime: [https://go.microsoft.com/fwlink/p/?LinkId=2124703](https://go.microsoft.com/fwlink/p/?LinkId=2124703)  
    OR place the WebView2 Shared Runtime in the runtime directory (PlayReady DRM will not be available).
 
-2. .NET 4.5.2 or later
+2. .NET 10 (Windows)
 
 ## Control
 
@@ -49,7 +49,7 @@ x86/x64/arm64
 1. 安装 WebView2 Runtime：https://go.microsoft.com/fwlink/p/?LinkId=2124703  
    或将 WebView2 Shared Runtime 放入 runtime 目录（PlayReady DRM 将不可用）
 
-2. .Net 4.5.2+
+2. .NET 10 (Windows)
 
 ## 控制
 

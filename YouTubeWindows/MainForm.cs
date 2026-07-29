@@ -43,59 +43,47 @@ namespace YouTubeWindows
         }
 
         private bool _fullscreen = false;
-        public bool fullscreen
+
+        internal void ToggleFullscreen()
         {
-            get
+            _fullscreen = !_fullscreen;
+            if (_fullscreen)
             {
-                return _fullscreen;
+                FormBorderStyle = FormBorderStyle.None;
+                WindowState = FormWindowState.Maximized;
             }
-            set
+            else
             {
-                _fullscreen = value;
-                if (_fullscreen)
-                {
-                    FormBorderStyle = FormBorderStyle.None;
-                    WindowState = FormWindowState.Maximized;
-                }
-                else
-                {
-                    FormBorderStyle = FormBorderStyle.Sizable;
-                    WindowState = FormWindowState.Normal;
-                }
+                FormBorderStyle = FormBorderStyle.Sizable;
+                WindowState = FormWindowState.Normal;
             }
         }
 
         private bool _cursorShown = true;
-        public bool cursorShown
+
+        private void SetCursorShown(bool value)
         {
-            get
+            if (value == _cursorShown)
             {
-                return _cursorShown;
+                return;
             }
-            set
+
+            if (value)
             {
-                if (value == _cursorShown)
+                TryInvoke(() =>
                 {
-                    return;
-                }
-
-                if (value)
-                {
-                    TryInvoke(() =>
-                    {
-                        System.Windows.Forms.Cursor.Show();
-                    });
-                }
-                else
-                {
-                    TryInvoke(() =>
-                    {
-                        System.Windows.Forms.Cursor.Hide();
-                    });
-                }
-
-                _cursorShown = value;
+                    System.Windows.Forms.Cursor.Show();
+                });
             }
+            else
+            {
+                TryInvoke(() =>
+                {
+                    System.Windows.Forms.Cursor.Hide();
+                });
+            }
+
+            _cursorShown = value;
         }
 
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
@@ -244,6 +232,8 @@ namespace YouTubeWindows
 
             Controls.Add(splashScreenWebViewPanel); // 放置闪屏承载层（顶部）
             Controls.Add(screenWebViewPanel); // 放置App承载层（底部）
+
+            ToggleFullscreen();
         }
 
         protected override void WndProc(ref Message m)
@@ -287,7 +277,7 @@ namespace YouTubeWindows
             screenWebViewPanel.Controls.Add(screenWebView);
             splashScreenWebViewPanel.Controls.Add(splashScreenWebView);
 
-            InitializeSplashScreenAsync();
+            BeginInvoke(new Action(() => InitializeSplashScreenAsync()));
 
             Task.Run(async () =>
             {
@@ -305,7 +295,7 @@ namespace YouTubeWindows
                     {
                         if (currentMs >= hideMs)
                         {
-                            cursorShown = false;
+                            SetCursorShown(false);
                         }
                         else
                         {
@@ -316,7 +306,7 @@ namespace YouTubeWindows
                     else
                     {
                         currentMs = 0;
-                        cursorShown = true;
+                        SetCursorShown(true);
                         lastMousePos = pos;
                         //Console.WriteLine("Mouse Moved");
                     }
@@ -341,40 +331,78 @@ namespace YouTubeWindows
             await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Resource.InitJs);
         }
 
+        private async Task EnsureCoreWebView2WithRetryAsync(WebView2 webView2)
+        {
+            const int maxAttempts = 5;
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    await webView2.EnsureCoreWebView2Async(coreWebView2Environment);
+                    return;
+                }
+                catch (COMException) when (attempt < maxAttempts)
+                {
+                    await Task.Delay(500 * attempt);
+                }
+                catch (InvalidOperationException) when (attempt < maxAttempts)
+                {
+                    await Task.Delay(500 * attempt);
+                }
+            }
+
+            await webView2.EnsureCoreWebView2Async(coreWebView2Environment);
+        }
+
         private async void InitializeSplashScreenAsync()
         {
-            splashScreenWebView.Dock = DockStyle.Fill;
-            await splashScreenWebView.EnsureCoreWebView2Async(coreWebView2Environment);
-            await splashScreenWebView.ExecuteScriptAsync("document.body.style.backgroundColor = '#181818'");
-            await NativeBridgeRegister(splashScreenWebView);
-            _ = splashScreenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setEmitTouchEventsForMouse", "{\"enabled\": true}");
-            splashScreenWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-            splashScreenWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-            splashScreenWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
-            splashScreenWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-            InitializeMainAppAsync();
+            try
+            {
+                splashScreenWebView.Dock = DockStyle.Fill;
+                await EnsureCoreWebView2WithRetryAsync(splashScreenWebView);
+                await splashScreenWebView.ExecuteScriptAsync("document.body.style.backgroundColor = '#181818'");
+                await NativeBridgeRegister(splashScreenWebView);
+                _ = splashScreenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setEmitTouchEventsForMouse", "{\"enabled\": true}");
+                splashScreenWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                splashScreenWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
+                splashScreenWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
+                splashScreenWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+                InitializeMainAppAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("WebView2 initialization failed:\n" + ex.Message, "YouTube");
+                Close();
+            }
         }
 
         private async void InitializeMainAppAsync()
         {
-            await screenWebView.EnsureCoreWebView2Async(coreWebView2Environment);
-            screenWebView.CoreWebView2.Settings.UserAgent = userAgent;
-            await NativeBridgeRegister(screenWebView);
-            _ = screenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setEmitTouchEventsForMouse", "{\"enabled\": true}");
-            _ = screenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setDeviceMetricsOverride", "{\"width\": 0, \"height\": 0, \"deviceScaleFactor\": 1, \"scale\": 0.1, \"screenWidth\": 7680,\"screenHeight\": 4320, \"mobile\": false, \"dontSetVisibleSize\": false}");
-            screenWebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
-            screenWebView.CoreWebView2.AddWebResourceRequestedFilter("https://www.gstatic.com/ytlr/txt/licenses_*", CoreWebView2WebResourceContext.All);
-            screenWebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
-            screenWebView.CoreWebView2.WindowCloseRequested += CoreWebView2_WindowCloseRequested;
-            screenWebView.CoreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
-            screenWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-            screenWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-            screenWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
-            screenWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+            try
+            {
+                await EnsureCoreWebView2WithRetryAsync(screenWebView);
+                screenWebView.CoreWebView2.Settings.UserAgent = userAgent;
+                await NativeBridgeRegister(screenWebView);
+                _ = screenWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setEmitTouchEventsForMouse", "{\"enabled\": true}");
+                screenWebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
+                screenWebView.CoreWebView2.AddWebResourceRequestedFilter("https://www.gstatic.com/ytlr/txt/licenses_*", CoreWebView2WebResourceContext.All);
+                screenWebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
+                screenWebView.CoreWebView2.WindowCloseRequested += CoreWebView2_WindowCloseRequested;
+                screenWebView.CoreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
+                screenWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                screenWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
+                screenWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
+                screenWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 #if DEBUG
-            screenWebView.CoreWebView2.OpenDevToolsWindow();
+                screenWebView.CoreWebView2.OpenDevToolsWindow();
 #endif
-            ReloadApp();
+                ReloadApp();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("WebView2 initialization failed:\n" + ex.Message, "YouTube");
+                Close();
+            }
         }
 
         private void CoreWebView2_WindowCloseRequested(object sender, object e)
@@ -430,8 +458,8 @@ namespace YouTubeWindows
                 // 注入动画
                 screenWebView.ExecuteScriptAsync("document.body.style.opacity = 0; document.body.style.transition = 'opacity 333ms';");
                 // 修改设备型号
-                screenWebView.ExecuteScriptAsync("window.environment.brand = \"Apple\";");
-                screenWebView.ExecuteScriptAsync("window.environment.model = \"AppleTV\";");
+                screenWebView.ExecuteScriptAsync("window.environment.brand = \"Google\";");
+                screenWebView.ExecuteScriptAsync("window.environment.model = \"GoogleTV\";");
                 // 修改功能开关
                 screenWebView.ExecuteScriptAsync("window.environment.has_touch_support = true;");
                 screenWebView.ExecuteScriptAsync("window.environment.feature_switches.disable_client_side_app_quality_logic = false;");
@@ -450,18 +478,14 @@ namespace YouTubeWindows
 
         private void MainForm_Activated(object sender, EventArgs e)
         {
-            screenWebView.Focus();
+            if (screenWebView != null && screenWebView.IsHandleCreated)
+            {
+                screenWebView.Focus();
+            }
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            if (WindowState == FormWindowState.Normal)
-            {
-                var aspect = (double)16 / 9;
-                var height = this.ClientSize.Width / aspect;
-                var width = height * aspect;
-                this.ClientSize = new Size((int)width, (int)height);
-            }
         }
 
         private void MainForm_ResizeBegin(object sender, EventArgs e)
@@ -512,7 +536,7 @@ namespace YouTubeWindows
 
         public void ToggleFullscreen()
         {
-            ctxMainForm.fullscreen = !ctxMainForm.fullscreen;
+            ctxMainForm.ToggleFullscreen();
         }
 
         public void ConsoleWriteLine(string content)
