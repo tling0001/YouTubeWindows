@@ -9,7 +9,7 @@
     <AssemblyName>YouTubeKids</AssemblyName>
     <RootNamespace>YouTubeWindows</RootNamespace>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <ApplicationIcon>..\YouTubeWindows\Resources\icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\YouTubeWindows\Resources\yt kids.ico</ApplicationIcon>
     <ApplicationManifest>..\YouTubeWindows\app.manifest</ApplicationManifest>
     <Platforms>AnyCPU</Platforms>
     <BaseOutputPath>..\bin\</BaseOutputPath>
@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4078.44" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +56,9 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="..\YouTubeWindows\Resources\ytkids_splash_screen.html" Link="Resources\ytkids_splash_screen.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="..\YouTubeWindows\Properties\Settings.settings" Link="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

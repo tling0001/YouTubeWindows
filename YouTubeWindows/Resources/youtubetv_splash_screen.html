@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2017 Google Inc. All Rights Reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html xmlns:yt="http://youtube.com"><head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none';
+                   style-src 'sha256-IV9krB/THvXLJZX5A2rCJHbRO28Ug5ChNoh+hPvKruQ=';
+                   img-src data:;">
+  <title>YouTube TV</title>
+  <style>
+    #loader {
+      background-color: #242424;
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: 0;
+    }
+
+    #splash-image {
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcQAAAC1CAYAAADBVo/PAAAACXBIWXMAAAsSAAALEgHS3X78AAAO1klEQVR42u3d7XXiRhvG8QvOfocOIBWYVIBSQZwKzFaw3grWriBOBTEVxK4gooLFFUR0YCqY58Ogx6wXg0Ca0bz8f+fsSbIxb2OJS/fMaGZgjBEcGQyKBj81ljS78BWKgD5teeHj1pJeG/2cMa8cVACcfWVnG4iHw+rQ3013fw6ZcwgFY/XB31e7P6eD2JiSZgQIxFhDbT+s3gdX8a4Ku+LXjTO9vAvN/RDdD9pXGbOmuQAC0UXQ1d2I+92JBeGGCGz2grJ8F6SVjKloIoBAPBR8s11VN9sLQLohkUvlWe7Cc02FCeQWiHbcrv5D8AE/Wu2qyVLGPNEcQGqBaENwIela0ogmBxpbSnoiHIHYA3EwWEi6kzShmYFWNpIeJD1y6wkQUyAOBte7k5cgBLq1lXQrYx5pCiDkQLS3QDyKsUHAtRdJCybiAN0adhSGt7KTAQhDwL0rSd81GNzRFEAoFaK9X/BB0g1NCfRiJemasUWgz0C0YViKm+SBvm12oUgXKtDCZV2mhCEQkomkcrfQRSxKSYY/jf6UB9pv2vPr++Trcz6eH4iEIRCiUYShiMtVHl8rl7kh1XmBSBgCMYTilKbIwiqDz+jzAq88t0J8IgyB4EPxaXfxCqrEGINpn8/j+IwK0U7x5rYKIHxXsrO/QSDGGEx9BXHDQLTrkX7j+AOicbNbNQrpKqkQO/MiNZ9l+sixB0Tnka5TKkQqxOZteToQbVcp65IC8RmJrlMCsRvTxCvE9elAtFeXtxx3QLRuuBUjab5mmvYViL5et0Eg2jBkD0MgblSJVImxBuLEZzsOqQ6B5M25N5FAjCSY+grhkxXiguoQSMYdTZCk0uNr+Z5Y4ysQX+p/ORaIVIdAOq6ZcUqF2JLvseix7zY8HIh2EJ6ZpUA6RpK4L5FAjKlC9BXA61MVIicOkJ6CJkiSr5mmqVaIBCKQIc5rqkQqxCPt93Mg2nEGFvAG0jPinkQCkQrxvAqx4PgCksX5nZ4y0c/lozDb7P/HMICrAAAEIsKvEOeptx0VIpAXLnjT/FLfcuHWvrr+xAkDZGWiwWAsY157fh9rD68xlfvbxzYeKrR1w5/xUcEVSquLtvo4EO3yTqxOA6RfJfb9peZj4Y87ud/H9VFhrALkKxBTqxB/CMThgSsqAGkraILkVJ5eJ7UexPJYIHKiAOnjwjc9a0+v4+tWCB/Bu3n/F8PE0x8AgUggxlch+gje6lQgsvgvkL45TZCcV/mZaZpShVieCkROFCAH7HxBlRh2hehjcueRCpETBMgJwyMEYqhB5X0N00MVIicIkI8pTZCcKpFjx1dxVh4LRE4QgEAEFWLfx46PY/PgeCuBCOSJHiECMedAXBOIAGrMGUiPr5mmBCKApHC+UyWGejHl49isTgUiV4xAPiY0AYF4Idfd7eO+2mk/EK84loCM2MX8kZYqgQrRRxadDEQAeSEQqRBDCywf1eFWdrz1g0AcDAqOIwAgEHsOrlmfbUSFCOSLC+H0+Jpp6iq4ehs/3A/EKcdRgKb8WgAEWyXGWiFWBGKM/vtPuruTxkwARrRX40gzEIsU24cu09B9+yZVlbRY0BaI8Woc/lURv3cfQUuXadRGI+nvv6X1WioK2gMAFeLlXgnEFFxdSf/+Kz0+Mr6ILtBlSiCGxvWevKtj/5Mu0xjd3NhqkfFFtLzEogmS5GOmaazd7VWTQKTciM1oZMcX12vGFwH4rhJdbBTc6wzT/UBkXcNYTSZ2fLEspRlzJAB4CUQXAeaju6tsEoiI3Xwuff9uxxfpRkVTrFKVqsrDa3T9RRNMhYhU3NzY2zTu7mgLgAqRCvGsQBwM6GdLTT2+WFXcpgEQiFSI1urUDwzF1Ot0TSb2No2y5DYNIC+vkjaOX6PrLxXXWVQ1CUSkbj63y8A9PDC+iPcKmiBZlePnnwb+fAQijvjyxXaj3t7SFkD6ysgCcdJ3ewzFeoZ5GY2kP/9kGTiACjGkAJuG0B6MIeaqXgbu6YnxRYBAvFRX+RFMICJnv//ONlN5o4coXWVEx4/rL5+XJj9EIMJim6lccRWUtk0kx4/rC7NG1TKBiDf1NlNlyfgikIbK8fPHUiE2ui9zKBb2xnvzOdtMAWkoqRAJRHRhf5spAFSI8VaIjdqBLlMct78M3PU17QEQiC643puzcYUInDaZSP/8wzZT6ZnTBEkrOX6azTAlEHHB4c82U0BkNoG/vyKUKplAxGXqbaZYBg4IXeX4+YvAP3/jnT8IRFyuXgaObaaAkJWZV4hnBSJjCGiHbaaAnCvEWSqfnwoR3WGbKSDHQGx7sgdxDyKBCDfqbaZYBg4IQRl4hejy6vmsCUUEItyol4Fjm6nwDQaU8+lzOdM05ArxrOqYQIRbbDMVA24sTV8V8PEzCqU6JhDhB9tMAX0qHT53m0ALYpcLAhH9+PbNdqMyvgikUiFKl6+JPQ7pcxOI8G8yYZspgEBs8zgnlTGBiP7sbzNFNyoQTDAkEohnTyQiENG/ehk4tpkCXHI50zTEQDy7KiYQEQa2mQJcqxw+d4iBeHZVTCAiLGwzBQQTEB6CzeVYCRUiElFvM8UycEAMFeKlJ+lVSJ+XQETYvnyxk24AhByIlwSb6yvdsytiAhHh2mykP/5gTBHoKSAcB5zLMZHtJQ8iEBGe7Va6v7dLvT090R5Ah5eZDp/73IBzWSGuL3nQJ44PBGW5lG5vpddX2gJwExSTDCrEiwKRChFhWK2k336zS7oRhkBQQRFhhVhRISI+m429IZ+JM0Dsgeg6QJ1/TgIR/dhu7S0VDw9UhIA/lcPnLmIPfgIR/j0/23HCqqItgHwrxLmry21JF11lM4YIf15e7Djh9TVhCPR4JkYWcN5Cn0CEe9ut9PmzXYqtLGkPoF8hXI0WBCLyU99PyKSZcBnDVUpeQpppGlTgM4YIN1YrewsFXaNAToHY9FYKKkRkYLOx44RFQRgCYXJ5YoZQIbYKxC3HB1rbbqWvX233KOOEABVifxXixfdxDRXWNFzEaLm0QfjwQFsAcXA103Ta8+datXkwXaZoceitpF9/Zbk1ID5Vz4E4C/FzEYg4X70tU1FIazoYgAi5OnGbBuKIQETc2JYpyd8qTUAgdqjJThouJ96UbR7MbRdoZrm0i3Azc5QvRqTA5Yk81vGJLeNQPxcVIo7b35aJMAS4EGpfAbqsEFsHIleI+NlmY5dbKwpuowDS5Gqm6bjl/7/48r3tEwzV4p4NJOr+3q47ynJrQMoqR897qgKchvp56DLFm+dn6Zdf7Fght1EAqeurdzDYQGRSDey2TLe3dI3ypQh+910oegrE1l9gVIg5q5dbY1umnNEVkK+qp9edhPp5hgpjbyz49tdfLLcGUCG6cGwMMdhbLiTbZUog5oRtmQC8eZF01fFzji4My7afozW6THPBtkw4jC7TvLn6Mph5rhA7+RwEYur2l1tjnBA/Y1INv38Xxp4rxE4+B12mKVsu7exRbqEA4DcQpzF+jqGMIRBTw7ZMAJpx9f3/USAWIX8O7kNMyWZjK0J2okBzXDFRIbowjvFzMIaYgnqccDYjDHEeYxhDhIs1TT8aK5yH/P6HDhsEPiyXNghZbg1AWFWiL1VXT1R3mfJNGpvVyoYgM0cBBBIoJyrBoGeY7leIiMV2y7ZM6OyyiiaAOlgDtCFX44qdByLjCDGo7ydkWyYAYVeI0s8zSqehv3+6TGPw/Gxnj7LCDIB4AlGeApEu0yzUy61dXxOGcKGkCbDjovv8/Zihiy7TTZdP9qnrhEWX11NT2gCAryqx61sixicCMrjqtq4Q6TIF8sN5DyfBUl/Se3jfJYEIoAv0DMFJsHwQiC5uyndQIbJaBQBQIXZrHNv7ZlINkCtjShoBDgPx6ki1GGRlux+I3KQLAPlymQEuAnHT9RNSIQJ5Yv1i+KgSi90/xzG83/1AZBwRyAcT6eAjEGsubrkoXQYiJwjAlx/yVTp4zllMxzAVIkAgAq6OibqrtIgtEKkQgXxwAQwfgTiNqaJ9C0SmYAM54QIYh3Q903TqKBi3Lj780MeLAAgMF8DwUyXWXaaTjp/XSQ/H0MeLAAgKF77wFYhXjt4ngQgg3C8TJKF08JwmguA+GIgVxwNAIIIKMcdjmAoR4EsPIBAJRIAKEXgn9HWtt3I0S/rHQDTmVQ4WTAUQEGaYIu4q0dkF3ZCrRyArLOoNAvGMQOTqEUgXF7w4JfQMcBbYVIgAX3YAFeLBQGR8ASAQQSASiP/3zDEBJGcjYyqaAQ2EPNPU2Tq8Q64igWw80QTouwoLOaiHnDhANh5pAjRU5fi+Dgei7VZZcUwAydjIGCbMIfYKsYdA5GoSoDoEgRiesp9ANOZRrFoDpGAr6YFmwBleFeY2Yb1ViJJ0x3EBJFAd2mUZgdirxB4DkSoRSKE65MIWKQSi83ktwwY/c8txAUTrgeoQIVZjIb6f04FozJO4UR+I0YuMoTpEKhViAIFoLRTmACuA4+ctkEoglmEEou1y4eQC4vGV+w7RUmgzTYOpEOuu03uOESB4SxnDbRZIrUoMKBBtKN5JWnKMAMF6kTELmgGJBaKXja2HZz/CnmyEIhBiGEoFzYCYqrKQ3senix5lzEKDgSTdcLwAAYUht1jsKxN5jT49SRpn8rvUwBjT4tGDR0IR6N1S0i1hCLQzbPVo2336WdySAfTlXsYsCEOg7wrxrVKcya6mf0WTAl5sJC1kTElTACFUiG+V4lrGzGRvy6BaBNz6S9KMMARCrBB/rBbHslvNMLYIdGsp6W63gTeA4APxLRinsguDLySNaGrgIlvZmX4EIRBtIP4YjgtJ17L3SBGOwGnPuyB8YsIMkFIg/hiOxS4YZ7s/E34NoArUWvZeq5KxQSCXQPw5IMd74TjW20obc349SMyL7ILJ5e6fa0lrKkCAQDynotReYGovNMfiVg/0b6O3paXWu7CrA09UfACB2FelqQMBeui/p6K7FodDrbYfZG8BVwcflR1AIKbbGoPpLijfex+m2qtQZ0eekQq2G3VX40fWR/7/oerslb0CARCI4YZx0eLRRY/vvGzxWKosAMH4H9HbhAPK8c7HAAAAAElFTkSuQmCC);
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      height: 17.22%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+    }
+    /* spinningContainer spins its children when active. */
+    #spinningContainer {
+      position: fixed;
+      top: 71.5%;
+      left: 50%;
+      width: 166px;
+      height: 166px;
+      opacity: .2;
+      margin: 0 0 0 -83px;
+      display: none;
+    }
+
+    #spinningContainer.active {
+      display: block;
+      animation: spinning 5s linear infinite;
+    }
+
+    /* circle is a grey circle in spinningContainer. */
+    #circle {
+      border-radius: 50%;
+      color: #ffffff;
+      position: relative;
+      width: 166px;
+      height: 166px;
+      box-shadow: inset 0 0 0 15px;
+    }
+
+    /* occludingRectangle is a rectangle that occludes part of the circle. */
+    .occludingRectangle {
+      background-color: #282828;
+      position: absolute;
+      top: -1px;
+      width: 84px;
+      height: 169px;
+    }
+
+    /* firstRectangle is an occludingRectangle that starts spinning first. */
+    #firstRectangle {
+      left: 83px;
+      transform-origin: 0 83px;
+      animation: spinning 1000ms /* static image only time*/ cubic-bezier(0.4, 0.0, 0.2, 1) infinite 1833ms;
+    }
+
+    /* secondRectangle is an occludingRectangle that starts spinning second. */
+    #secondRectangle {
+      left: -1px;
+      transform-origin: 83px 83px;
+      animation: spinning 1000ms /* static image only time*/ cubic-bezier(0.4, 0.0, 0.2, 1) infinite 2583ms;
+    }
+
+    @keyframes spinning {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Scale circle for resolutions like 1440p with 1921px <= width <= 2560px. */
+    @media only screen and (min-device-width: 1921px) and (max-device-width: 2560px) {
+      #circle {
+        transform: scale(0.6666, 0.66666);
+      }
+    }
+
+    /* Scale circle for resolutions like 1080p with 1281px <= width <= 1920px. */
+    @media only screen and (min-device-width : 1281px) and (max-device-width : 1920px) {
+      #circle {
+        transform: scale(0.5, 0.5);
+      }
+    }
+
+    /* Scale circle for resolutions like 720p with 769px <= width <= 1280px. */
+    @media only screen and (min-device-width : 769px) and (max-device-width : 1280px) {
+      #circle {
+        transform: scale(0.33, 0.33);
+      }
+    }
+
+    /* Scale & shift circle for resolutions like 640x480, 768x576, 720x576 with width <= 768px. */
+    @media only screen and (max-device-width : 768px) {
+      #spinningContainer.active {
+        position: absolute;
+        top: 55vh;
+        animation: spinning 5s linear infinite;
+      }
+
+      #circle {
+        transform: scale(0.1875, 0.1875);
+      }
+    }
+    </style>
+</head>
+<body>
+<div id="loader">
+  <div id="splash-image"></div>
+</div>
+<div id="spinningContainer" class="active">
+  <div id="circle">
+    <div id="firstRectangle" class="occludingRectangle"></div>
+    <div id="secondRectangle" class="occludingRectangle"></div>
+  </div>
+</div>
+
+
+</body></html>

@@ -14,7 +14,9 @@ namespace YouTubeWindows
             Application.Run(new MainForm(args, new LaunchConfiguration(
                 "YouTube TV",
                 "https://www.youtube.com/tv/upg",
-                showSplashScreen: false)));
+                @"Resources\youtubetv_splash_screen.html",
+                showSplashScreen: false,
+                @"Resources\yt tv.ico")));
         }
     }
 }

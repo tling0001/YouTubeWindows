@@ -14,7 +14,9 @@ namespace YouTubeWindows
             Application.Run(new MainForm(args, new LaunchConfiguration(
                 "YouTube Kids",
                 "https://www.youtube.com/tv/kids",
-                showSplashScreen: false)));
+                @"Resources\ytkids_splash_screen.html",
+                showSplashScreen: false,
+                @"Resources\yt kids.ico")));
         }
     }
 }

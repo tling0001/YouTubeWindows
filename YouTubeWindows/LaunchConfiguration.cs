@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace YouTubeWindows
@@ -12,13 +13,15 @@ namespace YouTubeWindows
         public string StartUrl { get; }
         public bool ShowSplashScreen { get; }
         public string SplashScreenPath { get; }
+        public string IconPath { get; }
 
-        public LaunchConfiguration(string appTitle, string startUrl, string splashScreenPath = null, bool showSplashScreen = true)
+        public LaunchConfiguration(string appTitle, string startUrl, string splashScreenPath = null, bool showSplashScreen = true, string iconPath = null)
         {
             AppTitle = string.IsNullOrWhiteSpace(appTitle) ? "YouTube" : appTitle;
             StartUrl = string.IsNullOrWhiteSpace(startUrl) ? "https://www.youtube.com/tv" : startUrl;
             SplashScreenPath = splashScreenPath;
             ShowSplashScreen = showSplashScreen;
+            IconPath = iconPath;
         }
 
         public string LoadSplashScreenHtml()
@@ -28,9 +31,18 @@ namespace YouTubeWindows
                 return null;
             }
 
-            if (!string.IsNullOrWhiteSpace(SplashScreenPath) && File.Exists(SplashScreenPath))
+            if (!string.IsNullOrWhiteSpace(SplashScreenPath))
             {
-                return File.ReadAllText(SplashScreenPath);
+                var splashScreenPath = SplashScreenPath;
+                if (!Path.IsPathRooted(splashScreenPath))
+                {
+                    splashScreenPath = Path.Combine(AppContext.BaseDirectory, splashScreenPath);
+                }
+
+                if (File.Exists(splashScreenPath))
+                {
+                    return File.ReadAllText(splashScreenPath);
+                }
             }
 
             return Resource.youtube_splash_screen;

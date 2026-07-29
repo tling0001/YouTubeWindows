@@ -230,7 +230,27 @@ namespace YouTubeWindows
 
             UseImmersiveDarkMode(this.Handle, true);
 
-            this.Icon = Resource.icon;
+            if (!string.IsNullOrWhiteSpace(this.launchConfiguration.IconPath))
+            {
+                var iconPath = this.launchConfiguration.IconPath;
+                if (!Path.IsPathRooted(iconPath))
+                {
+                    iconPath = Path.Combine(AppContext.BaseDirectory, iconPath);
+                }
+
+                if (File.Exists(iconPath))
+                {
+                    this.Icon = new Icon(iconPath);
+                }
+                else
+                {
+                    this.Icon = Resource.icon;
+                }
+            }
+            else
+            {
+                this.Icon = Resource.icon;
+            }
 
             screenWebViewPanel.Dock = DockStyle.Fill;
             screenWebViewPanel.BackColor = Color.Transparent;
@@ -261,7 +281,7 @@ namespace YouTubeWindows
         private void MainForm_Load(object sender, EventArgs e)
         {
             var userDataDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "User Data";
-            userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.02.302";
+            userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.14.302";
             webview2StartupArgs = webview2StartupArgs + "--single-process --allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint";
 
             if (!allowAutoHDR)
