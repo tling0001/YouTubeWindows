@@ -33,3 +33,21 @@
 --enable-features={Feature1,Feature2,...}		Enable features such as Feature1, Feature2, etc. (Refer to Microsoft Edge documentation)
 ```
 
+## Building Yourself
+
+1. Open `YouTubeWindows.sln` in Visual Studio 2022 or later with the .NET 10 SDK installed.
+2. Restore NuGet packages if Visual Studio does not do it automatically.
+3. Build the solution.
+
+The three launchers will be built into the shared `bin\Debug` or `bin\Release` folder as:
+
+- `YouTube.exe`
+- `YouTubeKids.exe`
+- `YouTubeTV.exe`
+
+You can also build from the command line with:
+
+```powershell
+dotnet build YouTubeWindows.sln
+```
+
