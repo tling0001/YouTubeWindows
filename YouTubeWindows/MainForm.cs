@@ -485,8 +485,15 @@ namespace YouTubeWindows
             {
                 // Background playback
                 screenWebView.ExecuteScriptAsync("for (event_name of ['visibilitychange', 'webkitvisibilitychange', 'blur']) { window.addEventListener(event_name, function(event) { event.stopImmediatePropagation(); }, true); }");
-                // Inject animation
-                screenWebView.ExecuteScriptAsync("document.body.style.opacity = 0; document.body.style.transition = 'opacity 333ms';");
+                if (launchConfiguration.ShowSplashScreen)
+                {
+                    // Inject animation
+                    screenWebView.ExecuteScriptAsync("document.body.style.opacity = 0; document.body.style.transition = 'opacity 333ms';");
+                }
+                else
+                {
+                    screenWebView.ExecuteScriptAsync("document.body.style.opacity = 1; document.body.style.transition = 'none';");
+                }
                 // Spoof device model
                 screenWebView.ExecuteScriptAsync("window.environment.brand = \"Google\";");
                 screenWebView.ExecuteScriptAsync("window.environment.model = \"GoogleTV\";");
@@ -582,6 +589,7 @@ namespace YouTubeWindows
                 {
                     ctxMainForm.screenWebViewPanel.Visible = true;
                     ctxMainForm.screenWebView.Enabled = true;
+                    ctxMainForm.screenWebView.ExecuteScriptAsync("document.body.style.opacity = 1; document.body.style.transition = 'none';");
                     if (ctxMainForm.Focused)
                     {
                         ctxMainForm.screenWebView.Focus();
