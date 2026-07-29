@@ -1,27 +1,27 @@
 ﻿window.StarboardBridge = window?.chrome?.webview?.hostObjects?.NativeBridge;
 
 /**
- * 创建一个用于拦截并记录日志的 Proxy
- * @param {Object|Function} targetObject 目标对象或函数
- * @param {String} path 当前对象的路径记录（用于日志输出）
- * @returns {Proxy} 返回被代理的对象
+ * Creates a Proxy used to intercept and log activity.
+ * @param {Object|Function} targetObject The target object or function.
+ * @param {String} path The current object path used for log output.
+ * @returns {Proxy} The proxied object.
  */
 function createBridgeProxy(targetObject, path = 'mockObject') {
 
-    // 封装的日志输出函数
+    // Wrapped logging helper
     const log = (message) => {
         if (window.StarboardBridge && typeof window.StarboardBridge.ConsoleWriteLine === 'function') {
             window.StarboardBridge.ConsoleWriteLine(message);
         } else {
-            // 如果 StarboardBridge 尚未注入，退回使用 console.log 以防丢失报错
+            // If StarboardBridge has not been injected yet, fall back to console.log so errors are not lost.
             console.log("[Fallback Log] " + message);
         }
     };
 
     return new Proxy(targetObject, {
-        // 拦截读取成员变量 (Read)
+        // Intercept property reads
         get(target, property, receiver) {
-            // 忽略对 Symbol 属性的拦截 (例如原生 Promise、迭代器等内部机制的调用)
+            // Ignore Symbol properties (for example native Promise and iterator internals).
             if (typeof property === 'symbol') {
                 return Reflect.get(target, property, receiver);
             }
@@ -31,13 +31,13 @@ function createBridgeProxy(targetObject, path = 'mockObject') {
 
             let value = Reflect.get(target, property, receiver);
 
-            // 【关键点】如果访问的是未定义的属性，我们返回一个空函数。
-            // 这样无论调用多深的未定义方法（如 mockObject.a.b.c()），都不会报错，且能被 apply 拦截到。
+            // Key point: if the property is undefined, return a no-op function.
+            // That way deeply chained calls like mockObject.a.b.c() do not throw and can still be intercepted.
             if (value === undefined) {
                 value = function () { };
             }
 
-            // 如果读取到的值是对象或函数，递归包装成 Proxy，从而实现深层拦截
+            // If the value is an object or function, wrap it recursively in a Proxy for deep interception.
             if (value !== null && (typeof value === 'object' || typeof value === 'function')) {
                 return createBridgeProxy(value, currentPath);
             }
@@ -45,7 +45,7 @@ function createBridgeProxy(targetObject, path = 'mockObject') {
             return value;
         },
 
-        // 拦截赋值成员变量 (Set)
+        // Intercept property writes
         set(target, property, value, receiver) {
             if (typeof property !== 'symbol') {
                 const currentPath = `${path}.${property}`;
@@ -53,14 +53,14 @@ function createBridgeProxy(targetObject, path = 'mockObject') {
                 try {
                     valStr = JSON.stringify(value);
                 } catch (e) {
-                    valStr = String(value); // 防止处理循环引用对象时报错
+                    valStr = String(value); // Prevent errors when handling circular references.
                 }
                 log(`[Set Capture] ${currentPath} = ${valStr}`);
             }
             return Reflect.set(target, property, value, receiver);
         },
 
-        // 拦截调用成员方法 (Call)
+        // Intercept function calls
         apply(target, thisArg, argumentsList) {
             let argsStr = '';
             try {
@@ -71,13 +71,13 @@ function createBridgeProxy(targetObject, path = 'mockObject') {
 
             log(`[Call Capture] ${path}(${argsStr})`);
 
-            // 执行被代理对象原本的函数逻辑（例如触发 HideSplashScreen）
+            // Execute the original function logic (for example, trigger HideSplashScreen).
             return Reflect.apply(target, thisArg, argumentsList);
         }
     });
 }
 
-// 基础对象并注入默认方法
+// Base object and default methods
 const baseObject = {
     system: {
         hideSplashScreen: function () {
@@ -89,9 +89,9 @@ const baseObject = {
 };
 
 window.h5vcc = createBridgeProxy(baseObject, 'h5vcc');
-// 替换 Close
+// Replace Close
 window.close = window?.StarboardBridge?.Close;
-// 全屏和重载监听
+// Fullscreen and reload listeners
 window.addEventListener('keydown', (event) => {
     if (event.keyCode === 122) {
         event.preventDefault();
@@ -106,7 +106,7 @@ window.addEventListener('keydown', (event) => {
         event.returnValue = false; StarboardBridge.ReloadApp();
     }
 }, true);
-// Video 标签 Hook
+// Video tag hook
 window.HTMLVideoElement.prototype.playOriginal = window.HTMLVideoElement.prototype.play;
 window.HTMLVideoElement.prototype.play = function (...args) {
     this.msVideoProcessing = "msGraphicsDriverEnhancement";

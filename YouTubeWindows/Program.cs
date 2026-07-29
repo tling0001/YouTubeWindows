@@ -9,11 +9,12 @@ namespace YouTubeWindows
     static class Program
     {
         /// <summary>
-        /// 应用程序的主入口点。
+        /// Application entry point.
         /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm(args));

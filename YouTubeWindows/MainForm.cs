@@ -26,6 +26,7 @@ namespace YouTubeWindows
         private string userAgent = string.Empty;
         private string lang = System.Globalization.CultureInfo.InstalledUICulture.Name;
         private readonly LaunchConfiguration launchConfiguration;
+        internal bool ShowSplashScreen => launchConfiguration.ShowSplashScreen;
         public bool allowAutoHDR = false;
         public string webview2StartupArgs = "";
         WebView2RuntimeInfo? webview2RuntimeInfo = null;
@@ -148,11 +149,11 @@ namespace YouTubeWindows
             this.launchConfiguration = launchConfiguration ?? LaunchConfiguration.Default;
             string systemWebViewPath = Path.Combine(Environment.SystemDirectory, "Microsoft-Edge-WebView").ToString();
             string[] runtimePaths = {
-                // Fixed Version 固定版本
+                // Fixed Version
                 //AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "runtime",
-                // Evergreen 长青版
+                // Evergreen
                 null,
-                // System 内置版本
+                // System
                 systemWebViewPath,
             };
 
@@ -183,14 +184,14 @@ namespace YouTubeWindows
                     runtimeInfoHeader = "Fixed Version Runtime";
                 }
 
-                MessageBox.Show("当前 WebView2 Runtime:\n" + runtimeInfoHeader + "\nVersion: " + availableBrowserVersionString, this.launchConfiguration.AppTitle);
+                MessageBox.Show("Current WebView2 Runtime:\n" + runtimeInfoHeader + "\nVersion: " + availableBrowserVersionString, this.launchConfiguration.AppTitle);
 #endif
             }
             else
             {
                 if (lang.StartsWith("zh-"))
                 {
-                    MessageBox.Show("缺少 WebView2 Runtime，无法运行。\n可以通过以下任意一种方式安装：\n\n1. 安装任意非稳定通道 Microsoft Edge (Chromium) 浏览器。\n2. 安装 WebView2 Runtime Evergreen 版本。\n3. 将 WebView2 Runtime Fixed Version 版本放入 YouTube For Windows 的 runtime 文件夹下。", this.launchConfiguration.AppTitle);
+                    MessageBox.Show("WebView2 Runtime is missing and the app cannot run.\nYou can fix this in any of the following ways:\n\n1. Install any non-stable Microsoft Edge (Chromium) channel.\n2. Install the WebView2 Runtime Evergreen version.\n3. Place the WebView2 Runtime Fixed Version in the runtime folder for YouTube For Windows.", this.launchConfiguration.AppTitle);
                 }
                 else
                 {
@@ -236,8 +237,8 @@ namespace YouTubeWindows
             splashScreenWebViewPanel.Dock = DockStyle.Fill;
             splashScreenWebViewPanel.BackColor = Color.Transparent;
 
-            Controls.Add(splashScreenWebViewPanel); // 放置闪屏承载层（顶部）
-            Controls.Add(screenWebViewPanel); // 放置App承载层（底部）
+            Controls.Add(splashScreenWebViewPanel); // Splash host layer (top)
+            Controls.Add(screenWebViewPanel); // App host layer (bottom)
 
             ToggleFullscreen();
         }
@@ -334,7 +335,7 @@ namespace YouTubeWindows
         private async Task NativeBridgeRegister(WebView2 webView2)
         {
             webView2.CoreWebView2.AddHostObjectToScript("NativeBridge", new Bridge(this));
-            // 初始化 NativeBridge 和 Hook
+            // Initialize NativeBridge and hooks
             await webView2.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Resource.InitJs);
         }
 
@@ -365,6 +366,12 @@ namespace YouTubeWindows
         {
             try
             {
+                if (!launchConfiguration.ShowSplashScreen)
+                {
+                    await InitializeMainAppAsync();
+                    return;
+                }
+
                 splashScreenWebView.Dock = DockStyle.Fill;
                 await EnsureCoreWebView2WithRetryAsync(splashScreenWebView);
                 await splashScreenWebView.ExecuteScriptAsync("document.body.style.backgroundColor = '#181818'");
@@ -374,7 +381,7 @@ namespace YouTubeWindows
                 splashScreenWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
                 splashScreenWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
                 splashScreenWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-                InitializeMainAppAsync();
+                await InitializeMainAppAsync();
             }
             catch (Exception ex)
             {
@@ -383,7 +390,7 @@ namespace YouTubeWindows
             }
         }
 
-        private async void InitializeMainAppAsync()
+        private async Task InitializeMainAppAsync()
         {
             try
             {
@@ -436,7 +443,7 @@ namespace YouTubeWindows
                 e.Response = coreWebView2Environment.CreateWebResourceResponse(stream, 200, "OK", "Access-Control-Allow-Origin: *\r\nContent-Type: text/html");
                 new Thread(() =>
                 {
-                    Thread.Sleep(3000); // 流资源 3000ms 后释放
+                    Thread.Sleep(3000); // Release the stream resource after 3000 ms
                     var action = new Action(() =>
                     {
                         stream.Close();
@@ -449,25 +456,41 @@ namespace YouTubeWindows
 
         public void ReloadApp()
         {
-            screenWebView.Enabled = false;
-            splashScreenWebView.CoreWebView2.NavigateToString(launchConfiguration.LoadSplashScreenHtml());
+            var splashScreenHtml = launchConfiguration.LoadSplashScreenHtml();
+            if (!launchConfiguration.ShowSplashScreen)
+            {
+                screenWebViewPanel.Visible = true;
+                splashScreenWebViewPanel.Visible = false;
+                screenWebView.Enabled = true;
+                screenWebView.Dock = DockStyle.Fill;
+            }
+            else if (!string.IsNullOrWhiteSpace(splashScreenHtml) && splashScreenWebView != null && splashScreenWebView.CoreWebView2 != null)
+            {
+                splashScreenWebView.CoreWebView2.NavigateToString(splashScreenHtml);
+                splashScreenWebViewPanel.Visible = true;
+                screenWebViewPanel.Visible = false;
+            }
+            else
+            {
+                splashScreenWebViewPanel.Visible = false;
+                screenWebViewPanel.Visible = true;
+            }
+
             screenWebView.CoreWebView2.Navigate(launchConfiguration.StartUrl);
-            screenWebViewPanel.Visible = false;
-            splashScreenWebViewPanel.Visible = true;
         }
 
         private void CoreWebView2_DOMContentLoaded(object sender, CoreWebView2DOMContentLoadedEventArgs e)
         {
             if (screenWebView.Source.ToString().StartsWith("https://www.youtube.com"))
             {
-                // 后台播放
+                // Background playback
                 screenWebView.ExecuteScriptAsync("for (event_name of ['visibilitychange', 'webkitvisibilitychange', 'blur']) { window.addEventListener(event_name, function(event) { event.stopImmediatePropagation(); }, true); }");
-                // 注入动画
+                // Inject animation
                 screenWebView.ExecuteScriptAsync("document.body.style.opacity = 0; document.body.style.transition = 'opacity 333ms';");
-                // 修改设备型号
+                // Spoof device model
                 screenWebView.ExecuteScriptAsync("window.environment.brand = \"Google\";");
                 screenWebView.ExecuteScriptAsync("window.environment.model = \"GoogleTV\";");
-                // 修改功能开关
+                // Override feature flags
                 screenWebView.ExecuteScriptAsync("window.environment.has_touch_support = true;");
                 screenWebView.ExecuteScriptAsync("window.environment.feature_switches.disable_client_side_app_quality_logic = false;");
                 string deviceName = "YouTube on Windows";
@@ -553,6 +576,21 @@ namespace YouTubeWindows
 
         public void HideSplashScreen()
         {
+            if (!ctxMainForm.ShowSplashScreen || ctxMainForm.splashScreenWebView == null)
+            {
+                ctxMainForm.TryInvoke(() =>
+                {
+                    ctxMainForm.screenWebViewPanel.Visible = true;
+                    ctxMainForm.screenWebView.Enabled = true;
+                    if (ctxMainForm.Focused)
+                    {
+                        ctxMainForm.screenWebView.Focus();
+                    }
+                });
+
+                return;
+            }
+
             new Thread(() =>
             {
                 var action1 = new Action(() =>
