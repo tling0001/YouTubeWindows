@@ -25,6 +25,7 @@ namespace YouTubeWindows
 
         private string userAgent = string.Empty;
         private string lang = System.Globalization.CultureInfo.InstalledUICulture.Name;
+        private readonly LaunchConfiguration launchConfiguration;
         public bool allowAutoHDR = false;
         public string webview2StartupArgs = "";
         WebView2RuntimeInfo? webview2RuntimeInfo = null;
@@ -142,8 +143,9 @@ namespace YouTubeWindows
             }
         }
 
-        public MainForm(string[] args)
+        public MainForm(string[] args, LaunchConfiguration launchConfiguration = null)
         {
+            this.launchConfiguration = launchConfiguration ?? LaunchConfiguration.Default;
             string systemWebViewPath = Path.Combine(Environment.SystemDirectory, "Microsoft-Edge-WebView").ToString();
             string[] runtimePaths = {
                 // Fixed Version 固定版本
@@ -168,7 +170,8 @@ namespace YouTubeWindows
 #if DEBUG
                 var availableBrowserVersionString = CoreWebView2Environment.GetAvailableBrowserVersionString();
                 var runtimeInfoHeader = "";
-                if (webview2RuntimeInfo.Value.Path == null) {
+                if (webview2RuntimeInfo.Value.Path == null)
+                {
                     runtimeInfoHeader = "Evergreen Runtime";
                 }
                 else if (webview2RuntimeInfo.Value.Path == systemWebViewPath)
@@ -179,19 +182,21 @@ namespace YouTubeWindows
                 {
                     runtimeInfoHeader = "Fixed Version Runtime";
                 }
-                MessageBox.Show("当前 WebView2 Runtime:\n" + runtimeInfoHeader + "\nVersion: " + availableBrowserVersionString, "YouTube");
+
+                MessageBox.Show("当前 WebView2 Runtime:\n" + runtimeInfoHeader + "\nVersion: " + availableBrowserVersionString, this.launchConfiguration.AppTitle);
 #endif
             }
             else
             {
                 if (lang.StartsWith("zh-"))
                 {
-                    MessageBox.Show("缺少 WebView2 Runtime，无法运行。\n可以通过以下任意一种方式安装：\n\n1. 安装任意非稳定通道 Microsoft Edge (Chromium) 浏览器。\n2. 安装 WebView2 Runtime Evergreen 版本。\n3. 将 WebView2 Runtime Fixed Version 版本放入 YouTube For Windows 的 runtime 文件夹下。", "YouTube");
+                    MessageBox.Show("缺少 WebView2 Runtime，无法运行。\n可以通过以下任意一种方式安装：\n\n1. 安装任意非稳定通道 Microsoft Edge (Chromium) 浏览器。\n2. 安装 WebView2 Runtime Evergreen 版本。\n3. 将 WebView2 Runtime Fixed Version 版本放入 YouTube For Windows 的 runtime 文件夹下。", this.launchConfiguration.AppTitle);
                 }
                 else
                 {
-                    MessageBox.Show("The application cannot run because the WebView2 Runtime is missing.\nYou can resolve this by choosing one of the following methods:\n\n1. Install any non-stable channel version of Microsoft Edge (Chromium).\n2. Install the WebView2 Runtime Evergreen version.\n3. Place the WebView2 Runtime Fixed Version in the runtime folder of YouTube For Windows.", "YouTube");
+                    MessageBox.Show("The application cannot run because the WebView2 Runtime is missing.\nYou can resolve this by choosing one of the following methods:\n\n1. Install any non-stable channel version of Microsoft Edge (Chromium).\n2. Install the WebView2 Runtime Evergreen version.\n3. Place the WebView2 Runtime Fixed Version in the runtime folder of YouTube For Windows.", this.launchConfiguration.AppTitle);
                 }
+
                 Close();
                 Application.Exit();
                 return;
@@ -214,12 +219,13 @@ namespace YouTubeWindows
                         }
                         break;
                 }
-
             }
 
             webview2StartupArgs = webview2StartupArgsBuilder.ToString();
 
             InitializeComponent();
+
+            Text = this.launchConfiguration.AppTitle;
 
             UseImmersiveDarkMode(this.Handle, true);
 
@@ -247,6 +253,7 @@ namespace YouTubeWindows
                     }
                     break;
             }
+
             base.WndProc(ref m);
         }
 
@@ -255,7 +262,7 @@ namespace YouTubeWindows
             var userDataDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "User Data";
             userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.02.302";
             webview2StartupArgs = webview2StartupArgs + "--single-process --allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint";
-            
+
             if (!allowAutoHDR)
             {
                 webview2StartupArgs += " --disable_vp_auto_hdr";
@@ -443,8 +450,8 @@ namespace YouTubeWindows
         public void ReloadApp()
         {
             screenWebView.Enabled = false;
-            splashScreenWebView.CoreWebView2.NavigateToString(Resource.youtube_splash_screen);
-            screenWebView.CoreWebView2.Navigate("https://www.youtube.com/tv");
+            splashScreenWebView.CoreWebView2.NavigateToString(launchConfiguration.LoadSplashScreenHtml());
+            screenWebView.CoreWebView2.Navigate(launchConfiguration.StartUrl);
             screenWebViewPanel.Visible = false;
             splashScreenWebViewPanel.Visible = true;
         }
