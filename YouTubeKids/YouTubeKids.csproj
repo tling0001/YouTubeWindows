@@ -22,6 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\YouTubeWindows\Resources\yt kids.ico" Link="Resources\yt kids.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\YouTubeWindows\LaunchConfiguration.cs" Link="LaunchConfiguration.cs" />
     <Compile Include="..\YouTubeWindows\MainForm.cs" Link="MainForm.cs">
       <SubType>Form</SubType>

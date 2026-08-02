@@ -7,7 +7,10 @@ namespace YouTubeWindows
     {
         public static LaunchConfiguration Default { get; } = new LaunchConfiguration(
             "YouTube",
-            "https://www.youtube.com/tv");
+            "https://www.youtube.com/tv",
+            @"Resources\youtube_splash_screen.html",
+            true,
+            @"Resources\icon.ico");
 
         public string AppTitle { get; }
         public string StartUrl { get; }

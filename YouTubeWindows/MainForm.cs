@@ -45,10 +45,16 @@ namespace YouTubeWindows
         }
 
         private bool _fullscreen = false;
+        private bool _startupKioskMode = true;
 
         internal void ToggleFullscreen()
         {
-            _fullscreen = !_fullscreen;
+            ApplyWindowMode(!_fullscreen);
+        }
+
+        private void ApplyWindowMode(bool kioskMode)
+        {
+            _fullscreen = kioskMode;
             if (_fullscreen)
             {
                 FormBorderStyle = FormBorderStyle.None;
@@ -214,6 +220,16 @@ namespace YouTubeWindows
                             allowAutoHDR = true;
                         }
                         break;
+                    case "--kiosk":
+                        {
+                            _startupKioskMode = true;
+                        }
+                        break;
+                    case "--windowed":
+                        {
+                            _startupKioskMode = false;
+                        }
+                        break;
                     default:
                         {
                             webview2StartupArgsBuilder.Append(arg + " ");
@@ -260,7 +276,7 @@ namespace YouTubeWindows
             Controls.Add(splashScreenWebViewPanel); // Splash host layer (top)
             Controls.Add(screenWebViewPanel); // App host layer (bottom)
 
-            ToggleFullscreen();
+            ApplyWindowMode(_startupKioskMode);
         }
 
         protected override void WndProc(ref Message m)
@@ -282,7 +298,7 @@ namespace YouTubeWindows
         {
             var userDataDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "User Data";
             userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.14.302";
-            webview2StartupArgs = webview2StartupArgs + "--single-process --allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint";
+            webview2StartupArgs = webview2StartupArgs + "--allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint";
 
             if (!allowAutoHDR)
             {
@@ -515,8 +531,8 @@ namespace YouTubeWindows
                     screenWebView.ExecuteScriptAsync("document.body.style.opacity = 1; document.body.style.transition = 'none';");
                 }
                 // Spoof device model
-                screenWebView.ExecuteScriptAsync("window.environment.brand = \"Google\";");
-                screenWebView.ExecuteScriptAsync("window.environment.model = \"GoogleTV\";");
+                screenWebView.ExecuteScriptAsync("window.environment.brand = \"Apple\";");
+                screenWebView.ExecuteScriptAsync("window.environment.model = \"AppleTV\";");
                 // Override feature flags
                 screenWebView.ExecuteScriptAsync("window.environment.has_touch_support = true;");
                 screenWebView.ExecuteScriptAsync("window.environment.feature_switches.disable_client_side_app_quality_logic = false;");
