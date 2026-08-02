@@ -3,17 +3,18 @@
 ## Requirements
 
 **Operating System**
-- Windows 7/8.1/10/11
-- Windows Server 2008 R2/2012 R2/2012/2016/2019/2022/2025
+- Windows 10 1607 LTSC/Enterprise or later
+- Windows 11
+- Windows Server 2016/2019/2022/2025
 
 **Processor**
-- x86/x64/arm64
+- x64
 
 **Runtime**
 1. Install WebView2 Runtime: [https://go.microsoft.com/fwlink/p/?LinkId=2124703](https://go.microsoft.com/fwlink/p/?LinkId=2124703)  
    OR place the WebView2 Shared Runtime in the runtime directory (PlayReady DRM will not be available).
 
-2. .NET 10 (Windows)
+2. The app is built self-contained, so no separate .NET 10 runtime is required.
 
 ## Control
 
@@ -29,6 +30,8 @@
 
 ```
 --allow-auto-hdr					Allows stretching SDR content to HDR (e.g., NVIDIA RTX HDR)
+--kiosk					Starts in kiosk-style borderless fullscreen mode
+--windowed				Starts in a normal resizable window instead of kiosk mode
 --proxy-server="http://proxy-ip:proxy-port"		Access via proxy
 --enable-features={Feature1,Feature2,...}		Enable features such as Feature1, Feature2, etc. (Refer to Microsoft Edge documentation)
 ```
@@ -44,6 +47,7 @@ The three launchers will be built into the shared `bin\Debug` or `bin\Release` f
 - `YouTube.exe`
 - `YouTubeKids.exe`
 - `YouTubeTV.exe`
+- `YouTubeMusic.exe`
 
 You can also build from the command line with:
 
