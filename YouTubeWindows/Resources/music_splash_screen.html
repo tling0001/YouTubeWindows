@@ -16,11 +16,10 @@
 -->
 <html>
   <head>
-    <meta http-equiv="Content-Security-Policy"
+        <meta http-equiv="Content-Security-Policy"
           content="default-src 'none';
-                   script-src 'sha256-FEPVaygAgg5HEEl8Fbty5nmG5m9Kygpno2DHIKosOec=';
-                   style-src 'sha256-2lPgY6KT8nB9UkWM/kssavaCg9t3QXnWPt3ifqatljc=';
-                   img-src 'self' data:;">
+           style-src 'sha256-2lPgY6KT8nB9UkWM/kssavaCg9t3QXnWPt3ifqatljc=';
+           img-src 'self' data:;">
     <style>
       body {
         overflow: hidden; /* don't add any scrollbar in Chrome */
@@ -255,43 +254,5 @@
         </div>
       </div>
     </div>
-    <script>
-      let staticWordmarkFinished = false;
-      let beforeunloadFired = false;
-
-      // Once we've shown the wordmark long enough, then potentially fade out if
-      // beforeunload has also fired.
-      document.getElementById('wordmarkContainer').addEventListener(
-        'animationend',
-        (e) => {
-          if (e.target == e.currentTarget) {
-            setTimeout(
-              () => {
-                staticWordmarkFinished = true;
-                if (beforeunloadFired) {
-                  document.getElementById('background').style.opacity = 0;
-                }
-              }, 500 /* wordmark only time */ );
-          }
-        });
-
-      document.getElementById('background').addEventListener(
-        'transitionend',
-        (e) => {
-          if (e.target == e.currentTarget) {
-            window.close();
-          }
-        });
-
-      // If beforeunload has fired, then potentially fade out if the wordmark
-      // has also been shown long enough.
-      window.addEventListener('beforeunload',
-        () => {
-          beforeunloadFired = true;
-          if (staticWordmarkFinished) {
-            document.getElementById('background').style.opacity = 0;
-          }
-        });
-    </script>
 </body>
 </html>

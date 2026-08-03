@@ -63,4 +63,5 @@ To publish all launchers for x86, x64, and arm64 into separate folders, run:
 
 That creates folders like `publish\win-x86`, `publish\win-x64`, and `publish\win-arm64`.
 Each architecture folder is flattened, so all four EXEs and their shared runtime files sit together in the same `publish\win-...` folder.
+It also creates zip files in your Downloads folder named `YouTubeLeanbackWindows-x86.zip`, `YouTubeLeanbackWindows-x86-64.zip`, and `YouTubeLeanbackWindows-arm64.zip`.
 

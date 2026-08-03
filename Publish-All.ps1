@@ -26,9 +26,22 @@ if (-not $dotnet) {
 foreach ($architecture in $architectures) {
     $runtimeIdentifier = "win-$architecture"
     $architectureRoot = Join-Path $PSScriptRoot (Join-Path 'publish' $runtimeIdentifier)
+    $downloadRoot = Join-Path $env:USERPROFILE 'Downloads'
+
+    switch ($architecture) {
+        'x86' { $zipName = 'YouTubeLeanbackWindows-x86.zip' }
+        'x64' { $zipName = 'YouTubeLeanbackWindows-x86-64.zip' }
+        'arm64' { $zipName = 'YouTubeLeanbackWindows-arm64.zip' }
+    }
+
+    $zipPath = Join-Path $downloadRoot $zipName
 
     if (Test-Path $architectureRoot) {
         Remove-Item $architectureRoot -Recurse -Force
+    }
+
+    if (Test-Path $zipPath) {
+        Remove-Item $zipPath -Force
     }
 
     New-Item -ItemType Directory -Force -Path $architectureRoot | Out-Null
@@ -57,4 +70,7 @@ foreach ($architecture in $architectures) {
     }
 
     Remove-Item (Join-Path $architectureRoot '_staging') -Recurse -Force
+
+    Compress-Archive -Path (Join-Path $architectureRoot '*') -DestinationPath $zipPath -Force
+    Write-Host "Created $zipPath"
 }
