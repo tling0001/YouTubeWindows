@@ -14,7 +14,7 @@
 1. Install WebView2 Runtime: [https://go.microsoft.com/fwlink/p/?LinkId=2124703](https://go.microsoft.com/fwlink/p/?LinkId=2124703)  
    OR place the WebView2 Shared Runtime in the runtime directory (PlayReady DRM will not be available).
 
-2. The app is built self-contained, so no separate .NET 10 runtime is required.
+2. Install the .NET 10 Runtime.
 
 ## Control
 
@@ -64,4 +64,3 @@ To publish all launchers for x86, x64, and arm64 into separate folders, run:
 That creates folders like `publish\win-x86`, `publish\win-x64`, and `publish\win-arm64`.
 Each architecture folder is flattened, so all four EXEs and their shared runtime files sit together in the same `publish\win-...` folder.
 It also creates zip files in your Downloads folder named `YouTubeLeanbackWindows-x86.zip`, `YouTubeLeanbackWindows-x86-64.zip`, and `YouTubeLeanbackWindows-arm64.zip`.
-

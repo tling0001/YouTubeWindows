@@ -1,4 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
+﻿﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using System;
 using System.Collections.Generic;
@@ -153,7 +153,7 @@ namespace YouTubeWindows
         public MainForm(string[] args, LaunchConfiguration launchConfiguration = null)
         {
             this.launchConfiguration = launchConfiguration ?? LaunchConfiguration.Default;
-            string systemWebViewPath = Path.Combine(Environment.SystemDirectory, "Microsoft-Edge-WebView").ToString();
+            string systemWebViewPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "MicrosoftEdge-WebView");
             string[] runtimePaths = {
                 // Fixed Version
                 //AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "runtime",
@@ -296,7 +296,7 @@ namespace YouTubeWindows
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            var userDataDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "User Data";
+            var userDataDir = Path.Combine(AppContext.BaseDirectory, "User Data");
             userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.14.302";
             webview2StartupArgs = webview2StartupArgs + "--allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint,CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-background-timer-throttling --enable-gpu-rasterization --ignore-gpu-blocklist --enable-zero-copy";
 
