@@ -41,6 +41,15 @@ foreach ($variant in $publishVariants) {
         $downloadRoot = Join-Path $env:USERPROFILE 'Downloads'
         $zipPath = Join-Path $downloadRoot ($architecture.ZipName + '.zip')
 
+        # Clean bin and obj folders to prevent intermediate artifact contamination across architectures
+        $binDir = Join-Path $solutionDir 'bin'
+        if (Test-Path $binDir) {
+            Remove-Item $binDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        Get-ChildItem -Path $solutionDir -Recurse -Directory -Filter 'obj' | ForEach-Object {
+            Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
         if (Test-Path $architectureRoot) {
             Remove-Item $architectureRoot -Recurse -Force
         }
