@@ -42,7 +42,7 @@
 2. Restore NuGet packages if Visual Studio does not do it automatically.
 3. Build the solution.
 
-The three launchers will be built into the shared `bin\Debug` or `bin\Release` folder as:
+The four launchers will be built into the shared `bin\Debug` or `bin\Release` folder as:
 
 - `YouTube.exe`
 - `YouTubeKids.exe`
@@ -54,4 +54,13 @@ You can also build from the command line with:
 ```powershell
 dotnet build YouTubeWindows.sln
 ```
+
+To publish all launchers for x86, x64, and arm64 into separate folders, run:
+
+```powershell
+.\Publish-All.ps1
+```
+
+That creates folders like `publish\win-x86`, `publish\win-x64`, and `publish\win-arm64`.
+Each architecture folder is flattened, so all four EXEs and their shared runtime files sit together in the same `publish\win-...` folder.
 

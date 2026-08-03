@@ -269,9 +269,9 @@ namespace YouTubeWindows
             }
 
             screenWebViewPanel.Dock = DockStyle.Fill;
-            screenWebViewPanel.BackColor = Color.Transparent;
+            screenWebViewPanel.BackColor = Color.FromArgb(24, 24, 24);
             splashScreenWebViewPanel.Dock = DockStyle.Fill;
-            splashScreenWebViewPanel.BackColor = Color.Transparent;
+            splashScreenWebViewPanel.BackColor = Color.FromArgb(24, 24, 24);
 
             Controls.Add(splashScreenWebViewPanel); // Splash host layer (top)
             Controls.Add(screenWebViewPanel); // App host layer (bottom)
@@ -298,7 +298,7 @@ namespace YouTubeWindows
         {
             var userDataDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "User Data";
             userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.14.302";
-            webview2StartupArgs = webview2StartupArgs + "--allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint";
+            webview2StartupArgs = webview2StartupArgs + "--allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint,CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-background-timer-throttling --enable-gpu-rasterization --ignore-gpu-blocklist --enable-zero-copy";
 
             if (!allowAutoHDR)
             {
@@ -309,9 +309,9 @@ namespace YouTubeWindows
             coreWebView2Environment = CoreWebView2Environment.CreateAsync(webview2RuntimeInfo.Value.Path, userDataDir, options).Result;
 
             splashScreenWebView = new WebView2();
-            splashScreenWebView.DefaultBackgroundColor = Color.Transparent;
+            splashScreenWebView.DefaultBackgroundColor = Color.FromArgb(24, 24, 24);
             screenWebView = new WebView2();
-            screenWebView.DefaultBackgroundColor = Color.Transparent;
+            screenWebView.DefaultBackgroundColor = Color.FromArgb(24, 24, 24);
 
             screenWebView.Enabled = false;
 
