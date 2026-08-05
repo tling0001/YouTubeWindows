@@ -298,7 +298,7 @@ namespace YouTubeWindows
         {
             var userDataDir = Path.Combine(AppContext.BaseDirectory, "User Data");
             userAgent = "TV (PLATFORM_DETAILS_OTT), Cobalt/" + webview2RuntimeInfo.Value.Version + "-CloudMoe (unlike Gecko) Starboard/14, SystemIntegratorName_OTT_CloudMoeSubsystem_2026/FirmwareVersion (Windows NT " + Environment.OSVersion.Version.ToString() + ") com.google.android.youtube.tv/7.14.302";
-            webview2StartupArgs = webview2StartupArgs + "--allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --disable-features=UserAgentClientHint,CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-background-timer-throttling --enable-gpu-rasterization --ignore-gpu-blocklist --enable-zero-copy";
+            webview2StartupArgs = webview2StartupArgs + "--allow-failed-policy-fetch-for-test --allow-running-insecure-content --disable-web-security --enable-features=IntelVpSuperResolution --disable-features=UserAgentClientHint,CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-background-timer-throttling --enable-gpu-rasterization --ignore-gpu-blocklist --enable-zero-copy";
 
             if (!allowAutoHDR)
             {
